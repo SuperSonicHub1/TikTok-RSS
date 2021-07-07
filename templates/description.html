@@ -1,0 +1,15 @@
+{% set video = post.get("video") %}
+{% set video_src = video.get("downloadAddr") or video.get("playAddr") %}
+{% set poster = video.get("cover") or video.get("originCover") or video.get("reflowCover") or video.get("dynamicCover") %}
+{% set video_attrs = {"src": video_src, "poster": poster} %}
+{% set caption = post.get("desc") %}
+<main>
+	{% if video %}
+	<figure>
+		<video{{ video_attrs | xmlattr }}></video>
+		{% if caption %}
+		<figcaption>{{caption}}</figcaption>
+		{% endif %}
+	</figure>
+	{% endif %}
+</main>
