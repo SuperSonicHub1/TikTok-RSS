@@ -20,6 +20,6 @@ def feed(username: str):
 
 @app.route('/lookup')
 def lookup():
-    return redirect(url_for('feed', username=request.args.get("q")))
+	return redirect(url_for('feed', username=request.args.get("q")))
 
 app.run(host='0.0.0.0',port=8080)
