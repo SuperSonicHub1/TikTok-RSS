@@ -1,6 +1,6 @@
 {% set video = post.get("video") %}
-{% set video_src = (video.get("downloadAddr") or video.get("playAddr")) %}
-{% set poster = video.get("cover") or video.get("originCover") or video.get("reflowCover") or video.get("dynamicCover") %}
+{% set video_src = video.get("play_addr", {}).get("url_list", [None])[0] %}
+{% set poster = video.get("cover", {}).get("url_list", [None])[0] %}
 {% set video_attrs = {"src": video_src, "poster": poster, "controls": "true"} %}
 {% set caption = post.get("desc") %}
 <main>
