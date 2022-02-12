@@ -2,8 +2,8 @@ import random
 import re
 import string
 import time
+from flask import abort
 from requests import Session, Response
-
 
 session = Session() 
 session.headers.update({})
@@ -27,9 +27,13 @@ def get_user_id(username: str) -> str:
 			'User-Agent': 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)'
 		}
 	)
-	return re.search(r'snssdk\d*://user/profile/(\d+)', res.text).group(1)
+	res.raise_for_status()
+	try:
+		return re.search(r'snssdk\d*://user/profile/(\d+)', res.text).group(1)
+	except AttributeError as e:
+		abort(404)
 
-def call_api(path: str, params: dict) -> Response:
+def call_api(path: str, params: dict) -> dict:
 	"""
 	https://github.com/yt-dlp/yt-dlp/blob/b31874334d5d68121a4a3f0d28dc1b39e5fca93b/yt_dlp/extractor/tiktok.py#L38-L84
 	"""
@@ -80,14 +84,16 @@ def call_api(path: str, params: dict) -> Response:
 			sid_tt,
 			domain=API_HOSTNAME
 		)
-	return session.get(f"https://{API_HOSTNAME}/aweme/v1/{path}/",headers={
+	res = session.get(f"https://{API_HOSTNAME}/aweme/v1/{path}/",headers={
 			'User-Agent': f'com.ss.android.ugc.trill/{MANIFEST_APP_VERSION} (Linux; U; Android 10; en_US; Pixel 4; Build/QQ3A.200805.001; Cronet/58.0.2991.0)',
 			'Accept': 'application/json',
 		},
 		params=params
 	)
+	res.raise_for_status()
+	return res.json()
 
-def get_user(username: str) -> Response:
+def get_user(username: str) -> dict:
 	"""
 	https://github.com/yt-dlp/yt-dlp/blob/b31874334d5d68121a4a3f0d28dc1b39e5fca93b/yt_dlp/extractor/tiktok.py#L529-L539
 	"""
@@ -104,4 +110,4 @@ def get_user(username: str) -> Response:
 	return call_api("aweme/post", params)
 
 if __name__ == "__main__":
-	print(get_user("emiru").json())
+	print(get_user("emiru"))

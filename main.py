@@ -1,7 +1,14 @@
 from generator import generate_feed
 from flask import Flask, redirect, make_response, render_template, url_for, request
+from requests import HTTPError
+from http import HTTPStatus
 
 app = Flask(__name__)
+
+@app.errorhandler(HTTPError)
+def handle_request_error(e: HTTPError):
+	if e.response.status_code == HTTPStatus.NOT_FOUND:
+		return "Supplied user could not be found", HTTPStatus.NOT_FOUND
 
 @app.route("/favicon.ico")
 def favicon():

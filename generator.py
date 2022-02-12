@@ -2,7 +2,7 @@ import client
 from extensions import MediaContent, Webfeeds, MediaItem, WebfeedsIcon
 from datetime import datetime
 from rfeed import Item, Feed, Guid, Image
-from flask import render_template
+from flask import render_template, abort
 
 def get_author(items: list) -> dict:
 	authors = list(
@@ -52,9 +52,10 @@ def generate_item(item: dict, author: dict) -> Item:
 	return Item(**item_info)
 
 def generate_feed(username: str) -> Feed:
-	res = client.get_user(username.lower())
-	body = res.json()
+	body = client.get_user(username.lower())
 	aweme_list = body.get("aweme_list", [])
+	if not aweme_list:
+		abort(404)
 	author = get_author(aweme_list)
 	items = map(
 		lambda item: generate_item(item, author),
