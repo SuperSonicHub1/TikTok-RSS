@@ -1,12 +1,17 @@
 {% set video = post.get("video") %}
-{% set video_src = video.get("play_addr", {}).get("url_list", [None])[1] %}
-{% set poster = video.get("cover", {}).get("url_list", [None])[0] %}
-{% set video_attrs = {"src": video_src, "poster": poster, "controls": "true"} %}
+{% set video_sources = video.get("play_addr_h264", {}).get("url_list", []) + video.get("play_addr", {}).get("url_list", []) + video.get("download_addr", {}).get("url_list", []) %}
+{% set poster = video.get("cover", {}).get("url_list")[0] %}
+{% set video_attrs = {"poster": poster, "controls": "true"} %}
 {% set caption = post.get("desc") %}
 <main>
 	{% if video %}
 	<figure>
-		<video{{ video_attrs | xmlattr }}></video>
+		<video{{ video_attrs | xmlattr }}>
+			{% for source in video_sources %}
+				{% set source_attrs = {"src": source} %}
+				<source {{ source_attrs | xmlattr }}>
+			{% endfor %}
+		</video>
 		{% if caption %}
 		<figcaption>{{caption}}</figcaption>
 		{% endif %}
