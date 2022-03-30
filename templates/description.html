@@ -9,7 +9,7 @@
 		<video{{ video_attrs | xmlattr }}>
 			{% for source in video_sources %}
 				{% set source_attrs = {"src": source} %}
-				<source {{ source_attrs | xmlattr }}>
+				<source {{ source_attrs | xmlattr }}/>
 			{% endfor %}
 		</video>
 		{% if caption %}
